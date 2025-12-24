@@ -1,0 +1,37 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-22.04
+
+variables:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_NOLOGO: true
+
+steps:
+- task: UseDotNet@2
+  displayName: Install .NET 8 SDK
+  inputs:
+    version: '8.0.x'
+    includePreviewVersions: false
+
+- script: |
+    dotnet --info
+  displayName: Verify .NET SDK
+
+- script: |
+    docker version
+    docker buildx version
+  displayName: Verify Docker
+
+- script: |
+    dotnet restore
+    dotnet build -c Release
+    dotnet test -c Release
+  displayName: Build & Test (.NET)
+
+- script: |
+    docker build \
+      -t myapp:$(Build.BuildId) \
+      .
+  displayName: Docker Build
