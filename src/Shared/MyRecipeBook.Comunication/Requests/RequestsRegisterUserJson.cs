@@ -1,8 +1,6 @@
-﻿using System.Xml.Serialization;
-
-namespace MyRecipeBook.Comunication.Requests
+﻿namespace MyRecipeBook.Comunication.Requests
 {
-    internal class RequestsRegisterUserJson
+    public class RequestsRegisterUserJson
     {
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
