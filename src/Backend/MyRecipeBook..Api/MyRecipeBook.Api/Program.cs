@@ -1,3 +1,6 @@
+using MyRecipeBook.Api.Filters;
+using MyRecipeBook.Api.Middleware;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -9,6 +12,8 @@ builder.Services.AddOpenApi();
 // Adiciona serviços do Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddMvc(options => options.Filters.Add(typeof(ExceptionFilters)));
 
 var app = builder.Build();
 
@@ -36,6 +41,19 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseMiddleware<CultureMiddleware>();
+
+builder.Services.AddLocalization();
+
+var supportedCultures = new[] { "pt-BR", "en-US", "fr" };
+
+app.UseRequestLocalization(options =>
+{
+    options.SetDefaultCulture("en-US")
+           .AddSupportedCultures(supportedCultures)
+           .AddSupportedUICultures(supportedCultures);
+});
 
 app.UseHttpsRedirection();
 

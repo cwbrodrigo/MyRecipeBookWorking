@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration.UserSecrets;
+﻿using Microsoft.AspNetCore.Mvc;
+using MyRecipeBook.Application.UseCases.User.register;
 using MyRecipeBook.Comunication.Requests;
 using MyRecipeBook.Comunication.Responses;
 
@@ -10,12 +9,18 @@ namespace MyRecipeBook.Api.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        [HttpPost("register")]
+        [HttpPost("User")]
         [ProducesResponseType(typeof(ResponseRegisteredUserJson), StatusCodes.Status201Created)]
         public IActionResult Register(RequestsRegisterUserJson request)
         {
+            var useCase = new RegisterUserUseCase();
+
+            var result = useCase.Execute(request);
+
             // Implementation for retrieving user profile
-            return Created();
+
+            return Created(string.Empty, result);
+
         }
     }
 }

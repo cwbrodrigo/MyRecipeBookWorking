@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MyRecipeBook.Exceptions\MyRecipeBook.Exceptions.csproj" />
+  </ItemGroup>
+
 </Project>
