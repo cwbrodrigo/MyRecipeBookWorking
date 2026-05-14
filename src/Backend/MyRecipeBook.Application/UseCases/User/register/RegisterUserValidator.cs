@@ -1,15 +1,12 @@
 ﻿using FluentValidation;
 using MyRecipeBook.Comunication.Requests;
 using MyRecipeBook.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MyRecipeBook.Application.UseCases.User.register
 {
     public class RegisterUserValidator : AbstractValidator<RequestsRegisterUserJson>
     {
-        public RegisterUserValidator() 
+        public RegisterUserValidator()
         {
             RuleFor(x => x.Name)
                 .NotEmpty().WithMessage(ResourceMessagesExceptions.NAME_EMPTY)

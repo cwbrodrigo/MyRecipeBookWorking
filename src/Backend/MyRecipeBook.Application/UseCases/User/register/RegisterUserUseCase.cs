@@ -1,49 +1,70 @@
-﻿using MyRecipeBook.Comunication.Requests;
-using MyRecipeBook.Comunication.Responses;
+﻿using AutoMapper;
+using MyRecipeBook.Application.Services.AutoMapper;
+using MyRecipeBook.Application.Services.Cryptography;
+using MyRecipeBook.Application.UseCases.DependencyInjection;
+using MyRecipeBook.Comunication.Requests;
 using MyRecipeBook.Exceptions.ExceptionsBase;
 
 namespace MyRecipeBook.Application.UseCases.User.register
 {
-    public class RegisterUserUseCase
+    public class RegisterUserUseCase : IRegisterUserUseCase
     {
-        public ResponseRegisteredUserJson Execute(RequestsRegisterUserJson requests)
+        private readonly IMapper _mapper;
+        private readonly IPasswordEncripter _encripter;
+
+        public RegisterUserUseCase(IMapper mapper, IPasswordEncripter encripter)
         {
+            _mapper = mapper;
+            _encripter = encripter;
+        }
+
+        public Domain.Entities.User Execute(RequestsRegisterUserJson requests)
+        {
+            if (_mapper == null)
+                throw new Exception("Mapper não foi injetado");
             // validar a request
-            Validate(requests);
+            var Criptografia = new PasswordEncripter();
 
-            // mapear a request em uma entidade
-            var user = new Domain.Entities.User()
-            {
-                Name = requests.Name,
-                Email = requests.Email,
-                Password = requests.Password
-            };
+            //var user = new AutoMapper.Mapper(new MapperConfiguration(cfg =>
+            //{
+            //    cfg.CreateMap<RequestsRegisterUserJson, Domain.Entities.User>();
+            //})).Map<Domain.Entities.User>(requests);
 
+            var user = _mapper.Map<Domain.Entities.User>(requests);
+            user.Password = _encripter.Encrypt(requests.Password);
             // Criptografar a senha
+
+            Validate(requests);
+            // mapear a request em uma entidade
 
             // Salvar no BD
 
-            return new ResponseRegisteredUserJson()
-            {
-                Name = requests.Name,
-            };
+            return user;
         }
 
         public void Validate(RequestsRegisterUserJson requests)
         {
-            var validator = new RegisterUserValidator();
-
-            var result = validator.Validate(requests);
-
-            if (result.IsValid == false)
+            try
             {
-                var errorMessage = result.Errors.Select(x => x.ErrorMessage).ToList();
+                var validator = new RegisterUserValidator();
 
-                //validator.ValidateAndThrow(requests);
+                var result = validator.Validate(requests);
 
-                throw new ErrorOnValidationException(errorMessage);
+                if (result.IsValid == false)
+                {
+                    var errorMessage = result.Errors.Select(x => x.ErrorMessage).ToList();
 
+                    //validator.ValidateAndThrow(requests);
+
+                    throw new ErrorOnValidationException(errorMessage);
+
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                throw;
             }
         }
     }
 }
+
